@@ -18,8 +18,25 @@ module.exports = function(grunt) {
 
         browserify: {
             dist: {
-                src: 'www/build/react/js/main.js',
+                src: 'www/build/src/js/main.js',
                 dest: 'www/public/scripts/main.js'
+            }
+        },
+
+        babel: {
+            options: {
+                sourceMap:true
+            },
+            dist: {
+                files: [
+                    {
+                      expand: true,
+                      cwd: 'www/src/js',
+                      src: ['**/*.js'],
+                      dest: 'www/build/src/js',
+                      ext: '.js'
+                    }
+                ]
             }
         },
 
@@ -28,9 +45,9 @@ module.exports = function(grunt) {
                 files: [
                     {
                       expand: true,
-                      cwd: 'www/src/js',
+                      cwd: 'www/build/src/js',
                       src: ['**/*.js'],
-                      dest: 'www/build/react/js',
+                      dest: 'www/build/src/js',
                       ext: '.js'
                     }
                   ]
@@ -50,13 +67,11 @@ module.exports = function(grunt) {
     });
 
 
-    grunt.loadNpmTasks('grunt-sass');
-    grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-react');
-    grunt.loadNpmTasks('grunt-contrib-watch');
+    require("load-grunt-tasks")(grunt);
 
     grunt.registerTask('default', ['js', 'sass']);
     grunt.registerTask('js', [
+        'babel',
         'react',
         'browserify'
     ]);

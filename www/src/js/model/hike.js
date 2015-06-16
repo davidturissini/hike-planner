@@ -17,7 +17,7 @@ var hikePrototype = Object.create(EventEmitter.prototype, {
 });
 
 
-module.exports = {
+export var factory = {
 
 	create: function (attrs) {
 		var hike = Object.create(hikePrototype);

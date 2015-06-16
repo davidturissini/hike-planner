@@ -41570,49 +41570,49 @@ var _ = require('lodash');
 
 var Map = React.createClass({
 
-    displayName:'HikeMap',
+    displayName: 'HikeMap',
 
-    getInitialState: function () {
+    getInitialState: function getInitialState() {
         return {
-            map:null
+            map: null
         };
     },
 
-    boundsChanged: function () {
+    boundsChanged: function boundsChanged() {
         if (typeof this.props.onBoundsChange === 'function') {
             this.props.onBoundsChange({
-                bounds:this.state.map.getBounds()
+                bounds: this.state.map.getBounds()
             });
         }
     },
 
-    componentDidMount: function () {
+    componentDidMount: function componentDidMount() {
         var node = this.getDOMNode();
 
         var centerPoint = {
-            lat:this.props.centerLat || 38.937479,
-            lon:this.props.centerLng || -119.982806
+            lat: this.props.centerLat || 38.937479,
+            lon: this.props.centerLng || -119.982806
         };
 
         var center = new google.maps.LatLng(centerPoint.lat, centerPoint.lon);
 
         var map = new google.maps.Map(node, {
-            center:center,
+            center: center,
             scrollwheel: false,
-            zoom:parseInt(this.props.zoom)
+            zoom: parseInt(this.props.zoom)
         });
 
         var boundsChanged = _.debounce(this.boundsChanged, this.props.boundsChangeDebounce);
         google.maps.event.addListener(map, 'bounds_changed', boundsChanged);
 
         this.setState({
-            map:map
+            map: map
         });
     },
 
-    markers:{},
+    markers: {},
 
-    render: function () {
+    render: function render() {
         var map = this.state.map;
         var hikes = this.props.hikes;
 
@@ -41621,13 +41621,12 @@ var Map = React.createClass({
 
             if (!this.markers[hike.id]) {
                 this.markers[hike.id] = new google.maps.Marker({
-                    position:latLng,
-                    map:map
+                    position: latLng,
+                    map: map
                 });
             }
 
             return hike.id;
-
         }, this);
 
         Object.keys(this.markers).forEach(function (id) {
@@ -41637,15 +41636,14 @@ var Map = React.createClass({
             }
         }, this);
 
-
-        return (
-            React.createElement("div", {className: "map"})
-        );
+        return React.createElement('div', { className: 'map' });
     }
 
 });
 
 module.exports = Map;
+
+
 },{"lodash":4,"react":159}],161:[function(require,module,exports){
 'use strict';
 
@@ -41654,16 +41652,15 @@ var _ = require('lodash');
 
 var HikeWeather = React.createClass({
 
-    displayName:'HikeWeather',
+    displayName: 'HikeWeather',
 
-    getInitialState: function () {
+    getInitialState: function getInitialState() {
         return {
-            weather:null
+            weather: null
         };
     },
 
-
-    render: function () {
+    render: function render() {
         var weather = this.props.weather;
         var weatherData = weather.getWeatherData();
         console.log(weather);
@@ -41688,70 +41685,88 @@ var HikeWeather = React.createClass({
             coverageString = coverageString.join(' ');
 
             if (previous) {
-                minMaxTemperatures = weather.getMinMaxTemperaturesForTimeRange(
-                    new Date(previous.time.start),
-                    new Date(w.time.start)
-                );
+                minMaxTemperatures = weather.getMinMaxTemperaturesForTimeRange(new Date(previous.time.start), new Date(w.time.start));
 
-                minMaxTemperatures = (
-                    React.createElement("div", null, 
-                        React.createElement("div", null, "High: ", minMaxTemperatures.max.value, " ", minMaxTemperatures.max.units), 
-                        React.createElement("div", null, "Low: ", minMaxTemperatures.min.value, " ", minMaxTemperatures.min.units)
+                minMaxTemperatures = React.createElement(
+                    'div',
+                    null,
+                    React.createElement(
+                        'div',
+                        null,
+                        'High: ',
+                        minMaxTemperatures.max.value,
+                        ' ',
+                        minMaxTemperatures.max.units
+                    ),
+                    React.createElement(
+                        'div',
+                        null,
+                        'Low: ',
+                        minMaxTemperatures.min.value,
+                        ' ',
+                        minMaxTemperatures.min.units
                     )
                 );
             }
 
-            return (
-                React.createElement("li", null, 
-                    React.createElement("h6", {className: "forecast-time"}, timeString), 
-                    React.createElement("div", {className: "forecast-precipitation"}, coverageString), 
-                    minMaxTemperatures
-                )
+            return React.createElement(
+                'li',
+                null,
+                React.createElement(
+                    'h6',
+                    { className: 'forecast-time' },
+                    timeString
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'forecast-precipitation' },
+                    coverageString
+                ),
+                minMaxTemperatures
             );
         });
 
-        return (
-            React.createElement("ul", {className: "forecast"}, 
-                weatherItems
-            )
-        );        
+        return React.createElement(
+            'ul',
+            { className: 'forecast' },
+            weatherItems
+        );
     }
 
 });
 
 module.exports = HikeWeather;
+
+
 },{"lodash":4,"react":159}],162:[function(require,module,exports){
 'use strict';
 
 var jquery = require('jquery');
 var hike = require('./../model/hike');
 
-function HikesQuery (params) {
+function HikesQuery(params) {
     this.params = params || {};
 };
 
 var proto = HikesQuery.prototype;
 
-
-proto.send =  function () {
+proto.send = function () {
 
     return jquery.ajax({
-        url:'/hikes',
-        dataType:'json',
-        data:this.params
-    })
-    .then(function (hikesData) {
+        url: '/hikes',
+        dataType: 'json',
+        data: this.params
+    }).then(function (hikesData) {
         return hikesData.map(function (hikeData) {
             return hike.create(hikeData);
         });
     });
-
 };
 
 HikesQuery.createQueryWithBounds = function (bounds) {
     return new HikesQuery({
-        bounds:bounds.toUrlValue()
-    })
+        bounds: bounds.toUrlValue()
+    });
 };
 
 module.exports = HikesQuery;
@@ -41763,41 +41778,40 @@ module.exports = HikesQuery;
 var jquery = require('jquery');
 var weather = require('./../model/weather');
 
-function WeatherQuery (params) {
+function WeatherQuery(params) {
     this.params = params || {};
 };
 
 var proto = WeatherQuery.prototype;
 
-proto.send =  function () {
+proto.send = function () {
 
     return jquery.ajax({
-        url:'/weather',
-        dataType:'json',
+        url: '/weather',
+        dataType: 'json',
         data: this.params
     }).then(function (e) {
-    	return e.map(function (weatherData) {
-    		return weather.create(weatherData);
-    	});
+        return e.map(function (weatherData) {
+            return weather.create(weatherData);
+        });
     });
-
 };
-
 
 WeatherQuery.queryHikes = function (hikes) {
-	var latLngs = hikes.map(function (hike) {
-	    return hike.coordinate.latitude + ',' + hike.coordinate.longitude;
-	});
+    var latLngs = hikes.map(function (hike) {
+        return hike.coordinate.latitude + ',' + hike.coordinate.longitude;
+    });
 
-	var query = new WeatherQuery({
-	    points:latLngs
-	});
+    var query = new WeatherQuery({
+        points: latLngs
+    });
 
-	return query.send();
+    return query.send();
 };
 
-
 module.exports = WeatherQuery;
+
+
 },{"./../model/weather":167,"jquery":3}],164:[function(require,module,exports){
 'use strict';
 
@@ -41809,22 +41823,22 @@ var WeatherQuery = require('./dataQueries/WeatherQuery');
 var _ = require('lodash');
 
 var HikeFinder = React.createClass({
-    displayName:'HikeList',
+    displayName: 'HikeList',
 
-    getInitialState: function () {
+    getInitialState: function getInitialState() {
         return {
-            hikes:[],
-            weather:[]
+            hikes: [],
+            weather: []
         };
     },
 
-    getHikeFromWeather: function (weather) {
+    getHikeFromWeather: function getHikeFromWeather(weather) {
         var lat;
         var lng;
         var hike;
         var coord = weather.attributes.coord;
 
-        for(var i = 0; i < this.state.hikes.length; i += 1) {
+        for (var i = 0; i < this.state.hikes.length; i += 1) {
             hike = this.state.hikes[i];
             lat = Math.round(hike.coordinate.latitude * 100) / 100;
             lng = Math.round(hike.coordinate.longitude * 100) / 100;
@@ -41835,67 +41849,64 @@ var HikeFinder = React.createClass({
         }
     },
 
-    weatherLoaded: function (weather) {
+    weatherLoaded: function weatherLoaded(weather) {
         var hikes = this.state.hikes.slice(0);
 
         weather.forEach(function (w, index) {
             var hike = this.getHikeFromWeather(w);
-            
+
             if (hike) {
                 hike.weather = w;
             }
-
         }, this);
 
         this.setState({
-            hikes:hikes
+            hikes: hikes
         });
     },
 
-    hikesLoaded: function (hikes) {
+    hikesLoaded: function hikesLoaded(hikes) {
         this.setState({
-            hikes:hikes
+            hikes: hikes
         });
 
         WeatherQuery.queryHikes(hikes.slice(0, 5)).then(this.weatherLoaded);
-
     },
 
-    onBoundsChange: function (evt) {
+    onBoundsChange: function onBoundsChange(evt) {
         var bounds = evt.bounds;
         var hikesQuery = HikeQuery.createQueryWithBounds(bounds);
-        
-        hikesQuery.send().then(this.hikesLoaded);
 
+        hikesQuery.send().then(this.hikesLoaded);
     },
 
-    render: function () {
-        return (
-            React.createElement("div", {id: "hike-finder"}, 
-                React.createElement(HikeMap, {
-                    hikes: this.state.hikes, 
-                    boundsChangeDebounce: "300", 
-                    onBoundsChange: this.onBoundsChange, 
-                    zoom: "10", 
-                    centerLat: "38.937479", 
-                    centerLng: "-119.982806"}), 
-
-                React.createElement(HikeList, {hikes: this.state.hikes})
-
-            )
+    render: function render() {
+        return React.createElement(
+            'div',
+            { id: 'hike-finder' },
+            React.createElement(HikeMap, {
+                hikes: this.state.hikes,
+                boundsChangeDebounce: '300',
+                onBoundsChange: this.onBoundsChange,
+                zoom: '10',
+                centerLat: '38.937479',
+                centerLng: '-119.982806' }),
+            React.createElement(HikeList, { hikes: this.state.hikes })
         );
     }
 
 });
 
 React.render(React.createElement(HikeFinder), document.getElementById('main'));
+
+
 },{"./components/hike/Map":160,"./dataQueries/HikesQuery":162,"./dataQueries/WeatherQuery":163,"./view/hike/list":168,"lodash":4,"react":159}],165:[function(require,module,exports){
 'use strict';
 
-var Temperature = function (value, units) {
+var Temperature = function Temperature(value, units) {
     this.value = parseFloat(value);
     this.units = parseFloat(units);
-}
+};
 
 var proto = Temperature.prototype;
 
@@ -41913,34 +41924,37 @@ proto.isEqualTo = function (temperature) {
 
 module.exports = {
 
-    create: function (value, units) {
+    create: function create(value, units) {
         return new Temperature(value, units);
     }
 
 };
+
+
 },{}],166:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
 var EventEmitter = require('events').EventEmitter;
-
 
 var hikePrototype = Object.create(EventEmitter.prototype, {
 	weather: {
-		set: function (w) {
+		set: function set(w) {
 			this._weather = w;
 			this.emit('weather');
 		},
 
-		get: function () {
+		get: function get() {
 			return this._weather;
 		}
 	}
 });
 
+var factory = {
 
-module.exports = {
-
-	create: function (attrs) {
+	create: function create(attrs) {
 		var hike = Object.create(hikePrototype);
 
 		hike.coordinate = attrs.coordinate;
@@ -41953,6 +41967,9 @@ module.exports = {
 	}
 
 };
+exports.factory = factory;
+
+
 },{"events":1}],167:[function(require,module,exports){
 'use strict';
 
@@ -41960,11 +41977,11 @@ var Temperature = require('./Temperature');
 
 var weatherProto = {
 
-    getMinMaxTemperaturesForTimeRange: function (start, end) {
+    getMinMaxTemperaturesForTimeRange: function getMinMaxTemperaturesForTimeRange(start, end) {
         var tempsData = this.attributes.data['temperature'].data;
         var minMax = {
-            min:Temperature.create(200, 'Fahrenheit'),
-            max:Temperature.create(0, 'Fahrenheit')
+            min: Temperature.create(200, 'Fahrenheit'),
+            max: Temperature.create(0, 'Fahrenheit')
         };
 
         tempsData.forEach(function (tempData) {
@@ -41973,7 +41990,6 @@ var weatherProto = {
 
             if (time >= start && time <= end) {
                 temp = Temperature.create(tempData.value, tempData.units);
-    
 
                 if (temp.isLessThan(minMax.min)) {
                     minMax.min = temp;
@@ -41982,43 +41998,40 @@ var weatherProto = {
                 if (temp.isGreaterThan(minMax.max)) {
                     minMax.max = temp;
                 }
-
             }
-
         }, this);
-
 
         return minMax;
     },
 
-	getHourlyTemperatures: function () {
-		return this.attributes.data['apparent-temperature'].data;
-	},
+    getHourlyTemperatures: function getHourlyTemperatures() {
+        return this.attributes.data['apparent-temperature'].data;
+    },
 
-    getCloudAmount: function () {
+    getCloudAmount: function getCloudAmount() {
         return this.attributes.data['cloud-amount'].data;
     },
 
-    getProbabilityOfPrecipitation: function () {
+    getProbabilityOfPrecipitation: function getProbabilityOfPrecipitation() {
         return this.attributes.data['probability-of-precipitation'].data;
     },
 
-    getWeatherData: function () {
+    getWeatherData: function getWeatherData() {
         return this.attributes.data['weather'];
     },
 
-	create: function (attrs) {
-		var weather = Object.create(weatherProto);
-		weather.attributes = attrs;
+    create: function create(attrs) {
+        var weather = Object.create(weatherProto);
+        weather.attributes = attrs;
 
-		return weather;
-
-	}
+        return weather;
+    }
 
 };
 
-
 module.exports = weatherProto;
+
+
 },{"./Temperature":165}],168:[function(require,module,exports){
 'use strict';
 
@@ -42028,36 +42041,37 @@ var HikePreview = require('./preview');
 var React = require('react');
 
 var HikeListView = React.createClass({
-    displayName:'HikeList',
-    getInitialState: function() {
+    displayName: 'HikeList',
+    getInitialState: function getInitialState() {
         return {
             hikes: []
         };
     },
 
-    componentDidUpdate: function () {
+    componentDidUpdate: function componentDidUpdate() {
         this.getDOMNode().scrollTop = 0;
     },
 
-    render: function () {
+    render: function render() {
         var hikes = this.props.hikes;
 
-        return (
-            React.createElement("div", {className: "pane"}, 
-                React.createElement("ul", null, 
+        return React.createElement(
+            'div',
+            { className: 'pane' },
+            React.createElement(
+                'ul',
+                null,
                 hikes.map(function (hike, index) {
-                    return (
-                        React.createElement(HikePreview, {weather: hike.weather, hike: hike})
-                        );
+                    return React.createElement(HikePreview, { weather: hike.weather, hike: hike });
                 })
-                )
             )
         );
     }
 });
 
-
 module.exports = HikeListView;
+
+
 },{"./preview":169,"events":1,"jquery":3,"react":159}],169:[function(require,module,exports){
 'use strict';
 
@@ -42066,27 +42080,35 @@ var React = require('react');
 var HikeWeather = require('./../../components/hike/Weather');
 
 var HikePreview = React.createClass({
-	displayName:'HikePreview',
-	render: function () {
+	displayName: 'HikePreview',
+	render: function render() {
 		var hike = this.props.hike;
 		var weather = hike.weather;
 		var weatherMarkup;
 
 		if (weather) {
-			weatherMarkup = React.createElement(HikeWeather, {weather: weather})
+			weatherMarkup = React.createElement(HikeWeather, { weather: weather });
 		}
 
-		return (
-			React.createElement("li", {className: "hike"}, 
-				React.createElement("h3", {className: "hike-title"}, 
-					React.createElement("a", {href: hike.url, target: "_BLANK"}, hike.title)
-				), 
-				React.createElement("img", {src: hike.image, className: "hike-image"}), 
-				weatherMarkup
-			)
+		return React.createElement(
+			'li',
+			{ className: 'hike' },
+			React.createElement(
+				'h3',
+				{ className: 'hike-title' },
+				React.createElement(
+					'a',
+					{ href: hike.url, target: '_BLANK' },
+					hike.title
+				)
+			),
+			React.createElement('img', { src: hike.image, className: 'hike-image' }),
+			weatherMarkup
 		);
 	}
 });
 
 module.exports = HikePreview;
+
+
 },{"./../../components/hike/Weather":161,"events":1,"react":159}]},{},[164]);
